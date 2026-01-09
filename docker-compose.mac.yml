@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: t3-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: t3app
+    ports:
+      # Maps standard Postgres port 5432 to your Mac
+      - "5432:5432"
+    volumes:
+      # Saves the data in a 'pgdata' folder on your Mac
+      # This ensures you don't lose data when you restart the container
+      - ./pgdata:/var/lib/postgresql/data

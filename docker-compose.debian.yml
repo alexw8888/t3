@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # 1. The Database (Similar to Mac, but 'restart: always')
+  db:
+    image: postgres:16-alpine
+    container_name: t3-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: t3app
+    # We use a named volume for data persistence
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - t3-network
+
+  # 2. The App (This does NOT exist in your Mac Docker setup)
+  app:
+    image: my-t3-app:latest  # The image you built and loaded
+    container_name: t3-web-app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      # CRITICAL CHANGE: connect to 'db', not 'localhost'
+      DATABASE_URL: "postgresql://myuser:mypassword@db:5432/t3app"
+      NODE_ENV: "production"
+    depends_on:
+      - db
+    networks:
+      - t3-network
+
+# Define the persistent volume
+volumes:
+  db_data:
+
+# Define the internal network so App can find DB
+networks:
+  t3-network:
